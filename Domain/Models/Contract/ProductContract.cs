@@ -90,7 +90,7 @@ namespace Domain.Models.Contract
             ValidateAdditionalSupportYears(additionalSupportYears);
             customer.EnsureCanAcquireProduct(product);
             
-            var promotionalDiscount = product.GetHighestActiveDiscount(DiscountType.SoftwarePurchase);
+            var promotionalDiscount = product.GetHighestActiveDiscount();
             var totalPrice = CalculatePrice(
                 product.AnnualLicensePrice,
                 additionalSupportYears,

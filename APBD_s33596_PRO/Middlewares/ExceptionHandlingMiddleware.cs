@@ -41,14 +41,14 @@ namespace APBD_s33596_PRO.Middlewares
                     error = ex.Message
                 });
             }
-            //catch (Exception)
-            //{
-            //    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            //    await context.Response.WriteAsJsonAsync(new
-            //    {
-            //        error = "An unexpected error occurred."
-            //    });
-            //}
+            catch (Exception)
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    error = "An unexpected error occurred."
+                });
+            }
         }
     }
 }

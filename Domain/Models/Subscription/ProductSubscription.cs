@@ -61,7 +61,7 @@ namespace Domain.Models.Subscription
                 throw new ConflictException("Cannot register a subscription for a deleted customer.");
 
             customer.EnsureCanAcquireProduct(product);
-            var promotionalDiscount = product.GetHighestActiveDiscount(DiscountType.SubscriptionFirstPeriod);
+            var promotionalDiscount = product.GetHighestActiveDiscount();
 
             var expectedFirstPayment = CalculateFirstPeriodPrice(
                pricePerPerid,

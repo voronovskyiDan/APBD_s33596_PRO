@@ -8,7 +8,9 @@ namespace Domain.Models.Discount
 {
     public enum DiscountType
     {
-        SoftwarePurchase,
-        SubscriptionFirstPeriod
+        Student,
+        Fest,
+        Staff,
+        General
     }
 }

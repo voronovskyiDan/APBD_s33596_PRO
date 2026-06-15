@@ -45,10 +45,10 @@ namespace Domain.Models.Product
             Category = category;
         }
 
-        public Discount.Discount? GetHighestActiveDiscount(DiscountType type)
+        public Discount.Discount? GetHighestActiveDiscount()
         {
             return Discounts
-                .Where(d => d.Type == type && d.IsActive(DateTime.UtcNow))
+                .Where(d => d.IsActive(DateTime.UtcNow))
                 .OrderByDescending(d => d.Percentage)
                 .FirstOrDefault();
         }
