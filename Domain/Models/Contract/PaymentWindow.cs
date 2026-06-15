@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Exceptions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,11 @@ namespace Domain.Models.Contract
         public PaymentWindow(DateTime startDate, DateTime endDate)
         {
             if (endDate < startDate)
-                throw new ArgumentException("End date must be greater than or equal to start date.");
+                throw new BadRequestException("End date must be greater than or equal to start date.");
 
             var days = (endDate.Date - startDate.Date).Days + 1;
             if (days < MinPaymentWindowDays || days > MaxPaymentWindowDays)
-                throw new ArgumentException(
+                throw new BadRequestException(
                     $"Contract payment window must be between {MinPaymentWindowDays} and {MaxPaymentWindowDays} days.");
 
             StartDate = startDate;

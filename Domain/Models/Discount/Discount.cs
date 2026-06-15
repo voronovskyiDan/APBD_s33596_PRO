@@ -1,4 +1,5 @@
-﻿using Domain.Models.Product;
+﻿using Domain.Exceptions;
+using Domain.Models.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Domain.Models.Discount
         public Discount(string name, decimal percentage, DateRange range, DiscountType type)
         {
             if (percentage <= 0 || percentage > 100)
-                throw new ArgumentException("Invalid discount percentage.");
+                throw new BadRequestException("Invalid discount percentage.");
 
             Name = name;
             Percentage = percentage;

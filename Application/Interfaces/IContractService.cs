@@ -1,5 +1,5 @@
-﻿using Application.DTOs.Contract;
-using Application.DTOs.Contract.Accept;
+﻿using Application.DTOs.Common;
+using Application.DTOs.Contract;
 using Application.DTOs.Contract.Add;
 using Application.DTOs.Customer;
 using Application.DTOs.Customer.Add;
@@ -15,7 +15,7 @@ namespace Application.Interfaces
     public interface IContractService
     {
         public Task<ContractDto> CreateContract(AddContractDto addContractDto);
-        public Task AcceptPayment(int id, AcceptPaymentDto acceptPayment);
+        public Task AcceptPayment(int contractId, AcceptPaymentDto acceptPayment);
         public Task<ContractDto?> GetById(int id);
     }
 }

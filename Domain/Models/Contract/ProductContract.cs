@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Exceptions;
 using Domain.Models.Discount;
 using Domain.Models.Product;
 using Domain.Models.Subscription;
@@ -47,7 +48,7 @@ namespace Domain.Models.Contract
         public void Delete()
         {
             if (Status == ContractStatus.Signed)
-                throw new InvalidOperationException("Signed contracts cannot be deleted.");
+                throw new ConflictException("Signed contracts cannot be deleted.");
 
             Status = ContractStatus.Deleted;
         }
@@ -55,16 +56,22 @@ namespace Domain.Models.Contract
         public void RegisterPayment(ContractPayment payment)
         {
             if (Status != ContractStatus.PendingPayment)
-                throw new InvalidOperationException("Payments can only be registered for pending contracts.");
+                throw new ConflictException("Payments can only be registered for pending contracts.");
 
-            if (payment.CustomerId != CustomerId)
-                throw new InvalidOperationException("Payment customer does not match contract customer.");
+            if (payment.Customer.Id != CustomerId)
+                throw new ConflictException("Payment customer does not match contract customer.");
+
+            if(Status == ContractStatus.Expired)
+                throw new ConflictException("Contract payment window has expired.");
 
             if (PaymentWindow.IsExpired())
-                throw new InvalidOperationException("Contract payment window has expired.");
+            {
+                Status = ContractStatus.Expired;
+                throw new ConflictException("Contract payment window has expired.");
+            }
 
-            if(TotalPaid > TotalPaid)
-                throw new InvalidOperationException("Contract payment amount is too big");
+            if (TotalPrice < TotalPaid + payment.AmountPln)
+                throw new ConflictException("Contract payment amount is too big");
             
             Payments.Add(payment);
 
@@ -79,7 +86,7 @@ namespace Domain.Models.Contract
             int additionalSupportYears)
         {
             if (customer.IsDeleted)
-                throw new InvalidOperationException("Cannot create a contract for a deleted customer.");
+                throw new ConflictException("Cannot create a contract for a deleted customer.");
             ValidateAdditionalSupportYears(additionalSupportYears);
             customer.EnsureCanAcquireProduct(product);
             
@@ -121,7 +128,7 @@ namespace Domain.Models.Contract
         private static void ValidateAdditionalSupportYears(int additionalSupportYears)
         {
             if (additionalSupportYears < 0 || additionalSupportYears > 3)
-                throw new ArgumentException("Additional support years must be between 0 and 3.");
+                throw new BadRequestException("Additional support years must be between 0 and 3.");
         }
 
         public void ExpireIfUnpaid(DateTime moment)

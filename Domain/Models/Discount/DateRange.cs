@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Domain.Models.Discount
         public DateRange(DateTime start, DateTime end)
         {
             if (end < start)
-                throw new ArgumentException("End date must be greater than or equal to start date.");
+                throw new BadRequestException("End date must be greater than or equal to start date.");
             Start = start;
             End = end;
         }

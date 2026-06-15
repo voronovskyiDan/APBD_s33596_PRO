@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs.Contract.Accept
+namespace Application.DTOs.Revenue
 {
-    public class AcceptPaymentDto
+    public class RevenueDto
     {
+        public decimal Revenue { get; set; }
     }
 }

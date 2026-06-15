@@ -25,10 +25,33 @@ namespace Infrastructure.Repositories
             return contract.Id;
         }
 
+        public async Task<List<ProductContract>> GetAllWithPayments()
+        {
+            return await _context.ProductContracts
+                .Include(x => x.Payments)
+                .ToListAsync();
+        }
+
+        public async Task<List<ProductContract>> GetAllWithPaymentsByProdcutId(int productId)
+        {
+            return await _context.ProductContracts
+                .Include(x => x.Payments)
+                .Where(p => p.SoftwareProductId == productId)
+                .ToListAsync();
+        }
+
         public async Task<ProductContract?> GetByIdAsync(int id)
         {
             return await _context.ProductContracts.Where(pc => pc.Id == id).FirstOrDefaultAsync();
         }
+        public async Task<ProductContract?> GetByIdWithPaymentsAsync(int id)
+        {
+            return await _context.ProductContracts
+                .Where(pc => pc.Id == id)
+                .Include(c => c.Payments)
+                .FirstOrDefaultAsync();
+        }
+
 
         public async Task SaveChangesAsync()
         {

@@ -1,4 +1,5 @@
-﻿using Domain.Models.Contract;
+﻿using Domain.Exceptions;
+using Domain.Models.Contract;
 using Domain.Models.Product;
 using Domain.Models.Subscription;
 using System;
@@ -21,10 +22,10 @@ namespace Domain.Models.Customer
 
         public bool IsDeleted { get; protected set; }
 
-        public ICollection<ProductContract> Contracts { get; private set; } = [];
-        public ICollection<ProductSubscription> Subscriptions { get; private set; } = [];
+        public List<ProductContract> Contracts { get; private set; } = [];
+        public List<ProductSubscription> Subscriptions { get; private set; } = [];
 
-        public ICollection<ContractPayment> ContractPayments { get; private set; } = [];
+        public List<ContractPayment> ContractPayments { get; private set; } = [];
         public ICollection<SubscriptionPayment> SubscriptionPayments { get; private set; } = [];
 
         protected Customer() { }
@@ -45,7 +46,7 @@ namespace Domain.Models.Customer
         public void UpdateContact(string address, string email, string phoneNumber)
         {
             if (IsDeleted)
-                throw new InvalidOperationException("Cannot update deleted customer.");
+                throw new ConflictException("Cannot update deleted customer.");
 
             Address = address;
             Email = email;
@@ -70,7 +71,7 @@ namespace Domain.Models.Customer
                 c.IsActive);
 
             if (hasActiveContract)
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "Customer already has an active contract for this product.");
 
             var hasActiveSubscription = Subscriptions.Any(s =>
@@ -78,7 +79,7 @@ namespace Domain.Models.Customer
                 s.Status == SubscriptionStatus.Active);
 
             if (hasActiveSubscription)
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "Customer already has an active subscription for this product.");
         }
 

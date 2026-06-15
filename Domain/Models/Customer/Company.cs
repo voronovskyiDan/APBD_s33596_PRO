@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,14 +28,14 @@ namespace Domain.Models.Customer
         public void UpdateCompanyName(string companyName)
         {
             if (IsDeleted)
-                throw new InvalidOperationException("Cannot update deleted company.");
+                throw new ConflictException("Cannot update deleted company.");
 
             CompanyName = companyName;
         }
 
         public override void Delete()
         {
-            throw new InvalidOperationException("Company customers cannot be deleted.");
+            throw new ConflictException("Company customers cannot be deleted.");
         }
     }
 }

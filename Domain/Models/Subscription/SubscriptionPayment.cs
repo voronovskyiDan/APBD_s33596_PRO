@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,38 +27,32 @@ namespace Domain.Models.Subscription
 
         public SubscriptionPayment(
             Customer.Customer customer,
-            decimal amountPln,
-            DateTime periodStart,
-            DateTime periodEnd)
+            ProductSubscription subscription,
+            decimal amountPln)
         {
             if (amountPln <= 0)
-                throw new ArgumentException("Payment amount must be positive.", nameof(amountPln));
-
-            if (periodStart > periodEnd)
-                throw new ArgumentException("Starting date must be before ending date");
+                throw new BadRequestException("Payment amount must be positive.");
 
             var now = DateTime.UtcNow;
-            if (now < periodStart || now > periodEnd)
-                throw new ArgumentException("Currnet time must be within start and end dates");
-
-
+            if (now < subscription.SubscriptionWindow.Start || now > subscription.SubscriptionWindow.End)
+                throw new BadRequestException("Currnet time must be within start and end dates");
+            
             Customer = customer;
+            Subscription = subscription;
             AmountPln = amountPln;
-            PeriodStart = periodStart;
-            PeriodEnd = periodEnd;
+            PeriodStart = subscription.SubscriptionWindow.Start;
+            PeriodEnd = subscription.SubscriptionWindow.End;
             PaymentDate = DateTime.UtcNow;
+
+            subscription.Payments.Add(this);
         }
 
         public SubscriptionPayment(
            Customer.Customer customer,
+           ProductSubscription subscription,
            decimal amountPln,
-           DateTime periodStart,
-           DateTime periodEnd,
-           DateTime dt) : this(customer, amountPln, periodStart, periodEnd)
+           DateTime dt) : this(customer, subscription, amountPln)
         {
-            if (dt < periodStart || dt > periodEnd)
-                throw new ArgumentException("Currnet time must be within start and end dates");
-
             PaymentDate = dt;
         }
     }

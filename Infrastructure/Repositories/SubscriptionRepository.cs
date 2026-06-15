@@ -26,9 +26,34 @@ namespace Infrastructure.Repositories
             return subscription.Id;
         }
 
+        public async Task<List<ProductSubscription>> GetAllWithPaymentsAndCustomer()
+        {
+            return await _context.ProductSubscriptions
+                .Include(x => x.Payments)
+                .Include(x => x.Customer)
+                .ToListAsync();
+        }
+
+        public async Task<List<ProductSubscription>> GetAllWithPaymentsAndCustomerByProdcutId(int productId)
+        {
+            return await _context.ProductSubscriptions
+                 .Include(x => x.Payments)
+                 .Include(x => x.Customer)
+                 .Where(p => p.SoftwareProductId == productId)
+                 .ToListAsync();
+        }
+
         public async Task<ProductSubscription?> GetByIdAsync(int id)
         {
             return await _context.ProductSubscriptions.Where(pc => pc.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<ProductSubscription?> GetByIdWithPaymentAsync(int id)
+        {
+            return await _context.ProductSubscriptions
+                .Where(pc => pc.Id == id)
+                .Include(x => x.Payments)
+                .FirstOrDefaultAsync();
         }
 
         public async Task SaveChangesAsync()

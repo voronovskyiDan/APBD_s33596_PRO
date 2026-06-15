@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Common;
 using Application.DTOs.Contract.Add;
+using Application.DTOs.Subscription.Add;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,34 +8,34 @@ namespace APBD_s33596_PRO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ContractController : ControllerBase
+    public class SubscriptionController : ControllerBase
     {
-        private readonly IContractService _contractService;
-        public ContractController(IContractService contractService)
+        private readonly ISubscriptionService _subscriptionService;
+        public SubscriptionController(ISubscriptionService subscriptionService)
         {
-            _contractService = contractService;
+            _subscriptionService = subscriptionService;
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var res = await _contractService.GetById(id);
+            var res = await _subscriptionService.GetById(id);
             if (res == null)
-                return NotFound("No contract with such id");
+                return NotFound("No subscription with such id");
             return Ok(res);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateContract(AddContractDto addContractDto)
+        public async Task<IActionResult> CreateSubscription(AddSubscriptionDto addSubscription)
         {
-            var contract = await _contractService.CreateContract(addContractDto);
+            var contract = await _subscriptionService.CreateSubscription(addSubscription);
             return CreatedAtAction(nameof(GetById), new { id = contract.Id }, contract);
         }
 
         [HttpPost("{id:int}/accept-payment")]
         public async Task<IActionResult> AcceptPayment(int id, AcceptPaymentDto acceptPaymentDto)
         {
-            await _contractService.AcceptPayment(id, acceptPaymentDto);
+            await _subscriptionService.AcceptPayment(id, acceptPaymentDto);
             return NoContent();
         }
     }

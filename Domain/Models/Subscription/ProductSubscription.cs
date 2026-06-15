@@ -1,13 +1,7 @@
 ﻿using Domain.Common;
-using Domain.Models.Contract;
-using Domain.Models.Customer;
+using Domain.Exceptions;
 using Domain.Models.Discount;
 using Domain.Models.Product;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Models.Subscription
 {
@@ -42,7 +36,6 @@ namespace Domain.Models.Subscription
             Customer.Customer customer,
             SoftwareProduct softwareProduct,
             SubscriptionStatus status,
-            List<SubscriptionPayment> payments,
             SubscriptionWindow subscriptionWindow)
         {
             Name = name;
@@ -51,7 +44,6 @@ namespace Domain.Models.Subscription
             Customer = customer;
             SoftwareProduct = softwareProduct;
             Status = status;
-            Payments = payments;
             SubscriptionWindow = subscriptionWindow;
         }
 
@@ -60,13 +52,13 @@ namespace Domain.Models.Subscription
                 SoftwareProduct product,
                 string name,
                 int renewalPeriodMonths,
-                int pricePerPerid
+                decimal pricePerPerid
             )
         {
             if (renewalPeriodMonths < MinRenewalPeriodMonths || renewalPeriodMonths > MaxRenewalPeriodMonths)
-                throw new ArgumentOutOfRangeException("Renewal Period must be within 3 month and 2 years");
+                throw new BadRequestException("Renewal Period must be within 3 month and 2 years");
             if (customer.IsDeleted)
-                throw new InvalidOperationException("Cannot register a subscription for a deleted customer.");
+                throw new ConflictException("Cannot register a subscription for a deleted customer.");
 
             customer.EnsureCanAcquireProduct(product);
             var promotionalDiscount = product.GetHighestActiveDiscount(DiscountType.SubscriptionFirstPeriod);
@@ -81,13 +73,6 @@ namespace Domain.Models.Subscription
             var subscriptionWindow = SubscriptionWindow.Create(now, renewalPeriodMonths);
 
 
-            SubscriptionPayment firstPayment = new SubscriptionPayment(
-                customer,
-                expectedFirstPayment,
-                now,
-                subscriptionWindow.Start,
-                subscriptionWindow.End);
-
             var subscription = new ProductSubscription(
                 name,
                 renewalPeriodMonths,
@@ -95,38 +80,41 @@ namespace Domain.Models.Subscription
                 customer,
                 product,
                 SubscriptionStatus.Active,
-                new List<SubscriptionPayment> { firstPayment },
                 subscriptionWindow);
+
+            SubscriptionPayment firstPayment = new SubscriptionPayment(
+                customer,
+                subscription,
+                expectedFirstPayment,
+                now);
 
             return subscription;
         }
 
-        public void PayRenewal(decimal amountPln)
+        public void PayRenewal(SubscriptionPayment payment)
         {
-            if (Status != SubscriptionStatus.Active)
-                throw new InvalidOperationException("Cannot pay for a cancelled subscription.");
+             if (Status != SubscriptionStatus.Active)
+                throw new ConflictException("Cannot pay for a cancelled subscription.");
+
+            if (payment.Customer.Id != CustomerId)
+                throw new ConflictException("Payment customer does not match contract customer.");
 
             if (SubscriptionWindow.IsExpired())
             {
                 Status = SubscriptionStatus.Cancelled;
-                throw new InvalidOperationException("Subscription cancelled due to unpaid previous periods.");
+                throw new ConflictException("Subscription cancelled due to unpaid previous periods.");
             }
 
             if (IsPaidForCurrentPeriod())
-                throw new InvalidOperationException("Current renewal period is already paid.");
+                throw new ConflictException("Current renewal period is already paid.");
 
             var expectedAmount = CalculateRenewalPrice(PricePerPeriod, Customer.IsReturningCustomer());
-            if (amountPln != expectedAmount)
-                throw new InvalidOperationException($"Renewal payment must equal {expectedAmount} PLN.");
+            if (payment.AmountPln != expectedAmount)
+                throw new ConflictException($"Renewal payment must equal {expectedAmount} PLN.");
 
-            Payments.Add(new SubscriptionPayment(
-                Customer,
-                amountPln,
-                SubscriptionWindow.Start,
-                SubscriptionWindow.End));
+            Payments.Add(payment);
 
             SubscriptionWindow.Advance(RenewalPeriodMonths);
-
         }
 
         public void Cancel() => Status = SubscriptionStatus.Cancelled;

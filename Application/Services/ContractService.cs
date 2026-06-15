@@ -1,5 +1,5 @@
-﻿using Application.DTOs.Contract;
-using Application.DTOs.Contract.Accept;
+﻿using Application.DTOs.Common;
+using Application.DTOs.Contract;
 using Application.DTOs.Contract.Add;
 using Application.Interfaces;
 using Domain.Exceptions;
@@ -29,12 +29,24 @@ namespace Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task AcceptPayment(int id, AcceptPaymentDto acceptPayment)
+        public async Task AcceptPayment(int contractId, AcceptPaymentDto acceptPayment)
         {
-            var contract = await _contractRepository.GetByIdAsync(id);
+            var contract = await _contractRepository.GetByIdWithPaymentsAsync(contractId);
             if (contract == null)
                 throw new NotFoundException("No contract with such id");
-            contract.
+
+            var customer = await _customerRespository.GetByIdAsync(acceptPayment.CustomerId);
+            if (customer == null)
+                throw new NotFoundException("No customer with such id");
+
+            ContractPayment contractPayment = new ContractPayment(customer, contract, acceptPayment.Amount);
+
+            try {
+                contract.RegisterPayment(contractPayment);
+            }
+            finally { 
+                await _contractRepository.SaveChangesAsync();
+            }
         }
 
         public async Task<ContractDto> CreateContract(AddContractDto addContractDto)
@@ -56,13 +68,13 @@ namespace Application.Services
                             addContractDto.AdditionalSupportYears
                             );
 
-            await _contractRepository.SaveChangesAsync();
+            int id = await _contractRepository.AddAsync(contract);
 
             return new ContractDto
             {
-                Id = contract.Id,
+                Id = id,
                 CustomerId = contract.CustomerId,
-                ProfuctId = contract.SoftwareProductId,
+                ProductId = contract.SoftwareProductId,
                 SoftwareVersion = contract.SoftwareVersion,
                 TotalPrice = contract.TotalPrice,
                 SigningDate = contract.SigningDate,
@@ -78,7 +90,7 @@ namespace Application.Services
             return new ContractDto {
                 Id = contract.Id,
                 CustomerId = contract.CustomerId,
-                ProfuctId = contract.SoftwareProductId,
+                ProductId = contract.SoftwareProductId,
                 SoftwareVersion = contract.SoftwareVersion,
                 TotalPrice = contract.TotalPrice,
                 SigningDate = contract.SigningDate,
