@@ -3,6 +3,7 @@ using Domain.Models.Customer;
 using Domain.Models.Discount;
 using Domain.Models.Product;
 using Domain.Models.Subscription;
+using Domain.Models.User;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Infrastructure.Data
             : base(options)
         {
         }
+        public DbSet<User> Users { get; set; }
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<IndividualCustomer> IndividualCustomers { get; set; }

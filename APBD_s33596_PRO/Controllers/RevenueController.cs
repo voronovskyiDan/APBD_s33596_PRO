@@ -1,10 +1,12 @@
 ﻿using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APBD_s33596_PRO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class RevenueController : ControllerBase
     {
         private readonly IRevenueService _revenueService;

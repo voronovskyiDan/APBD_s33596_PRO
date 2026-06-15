@@ -1,12 +1,14 @@
 ﻿using Application.DTOs.Common;
 using Application.DTOs.Contract.Add;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APBD_s33596_PRO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ContractController : ControllerBase
     {
         private readonly IContractService _contractService;

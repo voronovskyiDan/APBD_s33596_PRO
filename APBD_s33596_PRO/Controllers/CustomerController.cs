@@ -2,12 +2,14 @@
 using Application.DTOs.Customer.Add;
 using Application.DTOs.Customer.Update;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APBD_s33596_PRO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;

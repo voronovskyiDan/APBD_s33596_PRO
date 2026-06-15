@@ -1,33 +1,29 @@
-﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:63998",
-      "sslPort": 44376
-    }
-  },
+{
   "profiles": {
     "http": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5058",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5058"
     },
     "https": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7130;http://localhost:5058",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Security__Pepper": "9f3c7b1a6e4d2c8f91a0d5e6b3c7f8a2d4e6f1c9b0a7d3e5f6c8b1a4d9e2f7c",
+        "Jwt__Key": "4f9c1d7a8b2e6f3c9d0a1b5e7f8c2d6a9b3e1f7c0d4a8b6c9e2f1d5a7b8c0",
+        "Jwt__Issuer": "abc-api",
+        "Jwt__Audience": "abc-client",
+        "Jwt__ExpirationMinutes": "60"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7130;http://localhost:5058"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -36,6 +32,15 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:63998",
+      "sslPort": 44376
     }
   }
 }
