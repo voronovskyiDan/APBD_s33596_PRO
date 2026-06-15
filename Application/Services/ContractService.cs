@@ -51,11 +51,11 @@ namespace Application.Services
 
         public async Task<ContractDto> CreateContract(AddContractDto addContractDto)
         {
-            var customer = await _customerRespository.GetByIdAsync(addContractDto.CustomerId);
+            var customer = await _customerRespository.GetByIdAsync(addContractDto.CustomerId!.Value);
             if (customer == null)
                 throw new NotFoundException("No customer with such id");
 
-            var product = await _productRepository.GetByIdWithDiscountsAsync(addContractDto.ProdcutId);
+            var product = await _productRepository.GetByIdWithDiscountsAsync(addContractDto.ProdcutId!.Value);
             if (product == null)
                 throw new NotFoundException("No product with such id");
 
@@ -63,8 +63,8 @@ namespace Application.Services
                             customer,
                             product,
                             new PaymentWindow(
-                                addContractDto.StartDate,
-                                addContractDto.EndDate),
+                                addContractDto.StartDate!.Value,
+                                addContractDto.EndDate!.Value),
                             addContractDto.AdditionalSupportYears
                             );
 

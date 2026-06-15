@@ -46,11 +46,11 @@ namespace Application.Services
 
         public async Task<SubscriptionDto> CreateSubscription(AddSubscriptionDto addSubscriptionDto)
         {
-            var customer = await _customerRespository.GetByIdAsync(addSubscriptionDto.CustomerId);
+            var customer = await _customerRespository.GetByIdAsync(addSubscriptionDto.CustomerId!.Value);
             if (customer == null)
                 throw new NotFoundException("No customer with such id");
 
-            var product = await _productRepository.GetByIdWithDiscountsAsync(addSubscriptionDto.ProductId);
+            var product = await _productRepository.GetByIdWithDiscountsAsync(addSubscriptionDto.ProductId!.Value);
             if (product == null)
                 throw new NotFoundException("No product with such id");
 

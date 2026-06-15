@@ -8,7 +8,7 @@ namespace APBD_s33596_PRO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class ContractController : ControllerBase
     {
         private readonly IContractService _contractService;
